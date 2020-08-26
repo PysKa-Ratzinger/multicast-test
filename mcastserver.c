@@ -16,6 +16,16 @@ int datalen = sizeof(databuf);
 
 int main (int argc, char *argv[ ])
 {
+	if (argc != 3) {
+		printf("Usage: %s [MULTICAST_IP] [INTERFACE_IP]\n\n", argv[0]);
+		printf("    MULTICAST_IP - The IP address to publish the multicast messages\n");
+		printf("                   This is where the client should subscribe to.\n");
+		printf("                   Example: 226.1.1.1\n");
+		printf("    INTERFACE_IP - The IP address of the interface to use to publish the messages.\n");
+		printf("                   Can use \"ip addr\" to get the IPs.\n");
+		exit(-1);
+	}
+
 	/* Create a datagram socket on which to send. */
 	sd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(sd < 0)
@@ -30,7 +40,7 @@ int main (int argc, char *argv[ ])
 	/* group address of 225.1.1.1 and port 5555. */
 	memset((char *) &groupSock, 0, sizeof(groupSock));
 	groupSock.sin_family = AF_INET;
-	groupSock.sin_addr.s_addr = inet_addr("226.1.1.1");
+	groupSock.sin_addr.s_addr = inet_addr(argv[1]);
 	groupSock.sin_port = htons(4321);
 
 	/* Disable loopback so you do not receive your own datagrams.
@@ -50,7 +60,7 @@ int main (int argc, char *argv[ ])
 	/* Set local interface for outbound multicast datagrams. */
 	/* The IP address specified must be associated with a local, */
 	/* multicast capable interface. */
-	localInterface.s_addr = inet_addr("192.168.1.5");
+	localInterface.s_addr = inet_addr(argv[2]);
 	if(setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&localInterface, sizeof(localInterface)) < 0)
 	{
 		perror("Setting local interface error");

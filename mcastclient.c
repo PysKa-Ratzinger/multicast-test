@@ -17,6 +17,15 @@ char databuf[1024];
 
 int main(int argc, char *argv[])
 {
+	if (argc < 3) {
+		printf("Usage: %s [MULTICAST_IP] [INTERFACE_IP]\n\n", argv[0]);
+		printf("    MULTICAST_IP - The IP address to subscribe to the multicast messages\n");
+		printf("                   Example: 226.1.1.1\n");
+		printf("    INTERFACE_IP - The IP address of the interface to use to receive the messages.\n");
+		printf("                   Can use \"ip addr\" to get the IPs.\n");
+		exit(-1);
+	}
+
 	/* Create a datagram socket on which to receive. */
 	sd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(sd < 0)
@@ -60,8 +69,8 @@ int main(int argc, char *argv[])
 	/* interface. Note that this IP_ADD_MEMBERSHIP option must be */
 	/* called for each local interface over which the multicast */
 	/* datagrams are to be received. */
-	group.imr_multiaddr.s_addr = inet_addr("226.1.1.1");
-	group.imr_interface.s_addr = inet_addr("192.168.1.5");
+	group.imr_multiaddr.s_addr = inet_addr(argv[1]);
+	group.imr_interface.s_addr = inet_addr(argv[2]);
 	if(setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group)) < 0)
 	{
 		perror("Adding multicast group error");
